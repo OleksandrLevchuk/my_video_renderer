@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3 uid="uid://b77sym04e44xm"]
+
+[sub_resource type="GDScript" id="GDScript_ed1l2"]
+resource_name = "main"
+script/source = "extends Control
+
+@onready var text:RichTextLabel = $text_label
+
+#var file_path:String
+#var loaded_file:file = File.new()
+
+func _ready():
+	get_viewport().files_dropped.connect( _on_files_dropped )
+
+func _on_files_dropped( files: PackedStringArray ):
+#	print()
+#	var joined = \", \".join( files )
+#	print( joined )
+	text.text = 'dropped ' + str(files.size()) + ' files'
+"
+
+[node name="main" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 225.0
+offset_top = 170.0
+offset_right = 225.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_ed1l2")
+
+[node name="text_label" type="RichTextLabel" parent="."]
+layout_mode = 2
+offset_left = -217.0
+offset_top = -164.0
+offset_right = 446.0
+offset_bottom = 255.0
+text = "something something
+test 
+sdfsiodfj
+"

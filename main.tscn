@@ -1,0 +1,190 @@
+[gd_scene load_steps=3 format=3 uid="uid://b77sym04e44xm"]
+
+[sub_resource type="GDScript" id="GDScript_ed1l2"]
+resource_name = "main"
+script/source = "extends Control
+
+@onready var text:RichTextLabel = $text_label
+
+@onready var fps = $edit_fps
+#var file_path:String
+#var loaded_file:file = File.new()
+var path = 'D:\\\\_test\\\\'
+
+#func _ready():
+func _on_button_pressed():
+	var dir = DirAccess.open(path)
+	dir.remove( \"output.mp4\" )
+	var files = dir.get_files()
+	var list_name = \"input.txt\"
+	var list_path = path + \"input.txt\"
+	var list = FileAccess.open( list_path, FileAccess.WRITE )
+	for file_path in files:
+		if file_path.contains(\".jpg\") or file_path.contains(\".png\"):
+			list.store_line(\"file '\" + path + file_path + \"'\")
+	list.close()
+	var arr = []
+	print('fps ', str(fps.text))
+	var args = [\"-hide_banner\",
+#		\"-pattern_type\", \"glob\",
+#		\"-i\", \"D:\\\\_test\\\\%d.jpg\",
+		\"-r\", str(fps.text),
+		'-f', 'concat',
+		'-safe', '0',
+		'-i', path + 'input.txt',
+		
+		\"-c:v\", \"libx264\",
+#		\"-r\", \"1\", 
+#		\"-framerate\", \"2\", 
+#		\"-crf\", \"23\", 
+#		\"-t\", \"10\", 
+#		\"-pix_fmt\", \"yuv420p\",
+		\"D:\\\\_test\\\\output.mp4\"
+	]
+	var res = OS.execute( \"ffmpeg\", args, arr, true, true )
+#	dir.remove( list_name )
+	print (res, arr)
+#	text.text = 'dropped ' + str(files.size()) + ' files'
+
+
+func _on_dialog_select_folder_dir_selected( dir:String ):
+	path = dir
+	$label_path.text = dir
+"
+
+[sub_resource type="GDScript" id="GDScript_8520q"]
+resource_name = "dialog_select_folder"
+script/source = "extends FileDialog
+
+func _ready():
+	current_dir = \"D:\\\\\"
+	
+	
+func _on_btn_select_path_pressed():
+	show()
+"
+
+[node name="main" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 225.0
+offset_top = 170.0
+offset_right = 225.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_ed1l2")
+
+[node name="btn_select_path" type="Button" parent="."]
+layout_mode = 0
+offset_left = -195.0
+offset_top = -143.0
+offset_right = -46.0
+offset_bottom = -101.0
+text = "Select path"
+
+[node name="label_path" type="RichTextLabel" parent="."]
+layout_mode = 2
+offset_left = -20.0
+offset_top = -137.0
+offset_right = 415.0
+offset_bottom = -106.0
+text = "No path selected."
+
+[node name="HSlider" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = -200.0
+offset_top = 3.0
+offset_right = -79.0
+offset_bottom = 19.0
+
+[node name="label_fps" type="Label" parent="."]
+layout_mode = 0
+offset_left = -202.0
+offset_top = -26.0
+offset_right = -51.0
+text = "Frames per second:"
+
+[node name="edit_fps" type="TextEdit" parent="."]
+layout_mode = 0
+offset_left = -33.0
+offset_top = -32.0
+offset_right = 18.0
+offset_bottom = 7.0
+text = "20"
+
+[node name="label_duration" type="Label" parent="."]
+layout_mode = 0
+offset_left = -195.0
+offset_top = 59.0
+offset_right = -121.0
+offset_bottom = 85.0
+text = "Duration:"
+
+[node name="edit_duration" type="TextEdit" parent="."]
+layout_mode = 0
+offset_left = -99.0
+offset_top = 54.0
+offset_right = -36.0
+offset_bottom = 95.0
+text = "12:34"
+
+[node name="label_last_frame" type="Label" parent="."]
+layout_mode = 0
+offset_left = -191.0
+offset_top = 120.0
+offset_right = 2.0
+offset_bottom = 146.0
+text = "Extend the last frame by:"
+
+[node name="edit_last_frame" type="TextEdit" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 111.0
+offset_right = 76.0
+offset_bottom = 150.0
+text = "5"
+
+[node name="CheckButton" type="CheckButton" parent="."]
+layout_mode = 0
+offset_left = -73.0
+offset_top = 185.0
+offset_right = -29.0
+offset_bottom = 209.0
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = -181.0
+offset_top = 184.0
+offset_right = -84.0
+offset_bottom = 210.0
+text = "Image mode"
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = -12.0
+offset_top = 186.0
+offset_right = 80.0
+offset_bottom = 212.0
+text = "Video mode"
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = -193.0
+offset_top = 233.0
+offset_right = -75.0
+offset_bottom = 278.0
+text = "Render"
+
+[node name="dialog_select_folder" type="FileDialog" parent="."]
+title = "Open a Directory"
+initial_position = 2
+size = Vector2i(452, 162)
+ok_button_text = "Select Current Folder"
+file_mode = 2
+access = 2
+script = SubResource("GDScript_8520q")
+
+[connection signal="pressed" from="btn_select_path" to="dialog_select_folder" method="_on_btn_select_path_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="dir_selected" from="dialog_select_folder" to="." method="_on_dialog_select_folder_dir_selected"]
